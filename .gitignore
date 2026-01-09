@@ -1,0 +1,11 @@
+# Python
+.env
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.idea/
+debug.py
+test_api.py
+
+
