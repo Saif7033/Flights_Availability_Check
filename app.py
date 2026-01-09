@@ -46,6 +46,17 @@ elif user_option == 'Flight Details':        # first process on flight details
     with col3:
         date = st.date_input("Date")
 
+    col4, col5= st.columns(2)
+    with col4:
+        cabin_class= st.selectbox("Cabin_Class",["ECONOMY", "PREMIUM_ECONOMY", "BUSINESS", "FIRST"])
+
+    with col5:
+        stops= st.selectbox("Stops",["Any", "Direct Only", "1 Stop", "2 Stops"])
+        if stops == "Direct Only":
+            is_direct_api = True
+        else:
+            is_direct_api = False
+
 
     if st.button("Search"):
         date_str = date.strftime("%Y-%m-%d")
@@ -53,12 +64,21 @@ elif user_option == 'Flight Details':        # first process on flight details
         st.info(f"Searching flights from {Source_code} to {Destination_code} on {date_str}...")
 
         try:
-            result= api.search_flights(Source_code,Destination_code,date_str)
+            result= api.search_flights(Source_code,Destination_code,date_str,cabin_class,is_direct_api)
             if result.empty:
                 st.warning("No flights found")
             else:
-                st.success("Flights Found!")
-                st.dataframe(result, hide_index=True)
+                if stops== "1 Stop":
+                    result = result[result['stops'] == 1]
+                elif stops == "2 Stops":
+                    result = result[result['stops'] == 2]
+                if result.empty:
+                    st.warning(f"No {stops} flight found")
+                else:
+                    st.success("Flights Found!")
+                    st.dataframe(result, hide_index=True)
+
+
         except Exception as e:
             st.error(f"An error occurred: {e}")
 
